@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 import makeRoomRepeat from "./mesh/makeRoomRepeat";
@@ -8,8 +8,15 @@ import { setupBloomEffect } from "./settings/setBloom";
 import makeBackground from "./mesh/makeBackground";
 import { setLight } from "./settings/setLight";
 
+//const mockRooms = [401, 402, 403];
+const mockRooms = [
+  [4, 1],
+  [4, 2],
+  [4, 3],
+];
 export default function BuildingScene() {
   const mountRef = useRef<HTMLDivElement>(null);
+  const [scene, setScene] = useState<THREE.Scene | null>(null);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -25,6 +32,7 @@ export default function BuildingScene() {
       0.1
     );
     camera.position.z = 8;
+    camera.position.x = 1;
     camera.position.y = 1.5;
 
     // 렌더링
@@ -61,7 +69,7 @@ export default function BuildingScene() {
     //   // 카메라를 위로/아래로 이동시키기
     //   camera.position.y += delta * -0.005; // 이동 속도 조절
     // });
-
+    setScene(scene);
     //리무버
     return () => {
       mountRef.current?.removeChild(renderer.domElement);
@@ -69,6 +77,18 @@ export default function BuildingScene() {
       // window.removeEventListener("wheel", () => {});
     };
   }, []);
+
+  mockRooms.forEach((roomNumber, index) => {
+    if (scene === null) return;
+    const room = scene.getObjectByName(
+      `window-${roomNumber[0]}-${roomNumber[1]}`
+    ) as THREE.Mesh;
+
+    const mat = room.material;
+    if (mat instanceof THREE.MeshStandardMaterial) {
+      mat.emissiveIntensity = 0.35;
+    }
+  });
 
   return <div ref={mountRef} className="w-full h-screen " />;
 }
