@@ -1,3 +1,9 @@
+# 메모
+
+- 미사용 라이브러리 제거
+  - "@react-three/drei": "^10.7.6",
+  - "@react-three/fiber": "^9.4.0",
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
