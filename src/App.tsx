@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import BuildingScene from "./three/BuildingScene";
+import SubmitUserData from "./components/submitUserData";
 
 export default function App() {
   const [data, setData] = useState(null);
@@ -12,8 +13,9 @@ export default function App() {
 
   return (
     <div style={{ width: "100vw", height: "100vh" }} className="text-white">
-      <h1>{data ? data : "Loading..."}</h1>
+      <h1 className="bg-black">{data ? data : "Loading..."}</h1>
       <BuildingScene />
+      <SubmitUserData />
     </div>
   );
 }
