@@ -25,13 +25,13 @@ export default function makeRoom(x: number, y: number) {
   const windowMaterial = new THREE.MeshStandardMaterial({
     color: 0x998590, // 단면 색
     emissive: ROOM_COLOR[y][x], // 발광 색
-    emissiveIntensity: 0.35, // 발광 강도
-    //emissiveIntensity: 0.0, // 발광 강도
+    //emissiveIntensity: 0.35, // 발광 강도
+    emissiveIntensity: 0.0, // 발광 강도
   });
 
   const roomMesh = new THREE.Mesh(cubeGeometry, roomMaterial);
   const windowMesh = new THREE.Mesh(windowGeometry, windowMaterial);
-  windowMesh.name = `window-${x}-${y}`;
+  windowMesh.name = `window-${y + 1}-${x + 1}`;
   windowMesh.position.set(0, 0, 0.6); // 약간 앞쪽에 위치
   roomMesh.add(windowMesh); // 방 메쉬에 창문 메쉬 추가
 

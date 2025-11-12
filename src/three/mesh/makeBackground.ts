@@ -15,7 +15,7 @@ export default function makeBackground(scene: THREE.Scene) {
 }
 
 function makeFloor() {
-  const floorGeometry = new THREE.PlaneGeometry(10, 10);
+  const floorGeometry = new THREE.PlaneGeometry(15, 10);
   const floorMaterial = new THREE.MeshStandardMaterial({
     color: 0x808080,
     side: THREE.DoubleSide,
