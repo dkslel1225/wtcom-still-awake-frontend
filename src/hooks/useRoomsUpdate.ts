@@ -2,28 +2,51 @@ import { useEffect } from "react";
 import { roomsStateStore } from "../store/roomsStateStore";
 import * as THREE from "three";
 
-/** 
-  activatedRooms 값이 업데이트 되면, 건물 창문의 빛을 리렌더링 한다.(on,off)
-*/
 export const useRoomsUpdate = (scene: THREE.Scene | null) => {
   const { activatedRooms } = roomsStateStore();
 
   useEffect(() => {
-    activatedRooms.forEach(
-      (roomNumber) => {
-        if (scene === null) return;
+    if (!scene) return;
 
+    const updateRooms = async () => {
+      for (const roomNumber of activatedRooms) {
         const y = Math.floor(roomNumber / 100);
         const x = roomNumber % 100;
+        const name = `window-${y}-${x}`;
 
-        const room = scene.getObjectByName(`window-${y}-${x}`) as THREE.Mesh;
-
-        const mat = room.material;
-        if (mat instanceof THREE.MeshStandardMaterial) {
-          mat.emissiveIntensity = 0.35;
+        try {
+          const room = await waitForRoom(scene, name);
+          const mat = room.material;
+          if (mat instanceof THREE.MeshStandardMaterial) {
+            mat.emissiveIntensity = 0.35;
+          }
+        } catch (err) {
+          console.warn(err);
         }
-      },
-      [activatedRooms]
-    );
+      }
+    };
+
+    updateRooms();
+  }, [activatedRooms, scene]);
+};
+
+const waitForRoom = (scene: THREE.Scene, name: string) => {
+  return new Promise<THREE.Mesh>((resolve, reject) => {
+    const timeout = 3000;
+    const interval = 50;
+    let lastTime = 0;
+
+    const timer = setInterval(() => {
+      const room = scene.getObjectByName(name) as THREE.Mesh;
+      if (room) {
+        clearInterval(timer);
+        resolve(room);
+      }
+      if (!room && lastTime >= timeout) {
+        clearInterval(timer);
+        reject(new Error(`Timeout: failed room light update. ${name} missing`));
+      }
+      lastTime += interval;
+    }, interval);
   });
 };
