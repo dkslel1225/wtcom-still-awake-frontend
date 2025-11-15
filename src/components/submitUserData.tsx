@@ -1,20 +1,19 @@
 import { useState } from "react";
-import { ROOMS } from "../constants/room";
+import { ROOM_LIST } from "../constants/room";
 import clsx from "clsx";
-
-// 만석일떄는 start as a guest 로 UI 띄우도록... 추가 구현 필요
-// 🥲 근데 일단 28명 다 찰 일이 거의 없으니까 그부분은 생략하고 구현하자~
+import { roomsStateStore } from "../store/roomsStateStore";
+import { postUserData } from "../api/postUserData";
 
 export default function SubmitUserData() {
-  const [myRoom, setMyRoom] = useState("");
-  const roomNumber = Object.keys(ROOMS);
+  const { activatedRooms } = roomsStateStore();
+  const [myRoom, setMyRoom] = useState<number | null>(null);
 
   const onClickSubmit = async (e: any) => {
     e.preventDefault();
     const data = new FormData(e.target);
 
     // 뭐 하나 값 비어있으면 버튼 비활성화 - 거절!
-    if (myRoom === "") {
+    if (!myRoom) {
       alert("Room selection is required.");
       return; // 제출 중단
     }
@@ -26,32 +25,20 @@ export default function SubmitUserData() {
       calledAsName: data.get("call-by-name") ? true : false,
     };
 
-    try {
-      const response = await fetch("http://localhost:4000/submit/userdata", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
-
-      const resData = await response.json();
-      console.log(resData); // 여기서 서버에서 반환한 JSON 확인 가능
-    } catch (err) {
-      console.error("Error submitting user data:", err);
-    }
+    postUserData(userData);
+    setMyRoom(null);
 
     // 응답 성공하면, 내 방, 이름, 직업 데이터 다시 받음 -> 세션스토리지에 저장
     // 내 방 불 켜야 함.-> 이건 백엔드에서 알아서 자동 업데이트하게 해줄까 - 굳이 여기서 하지 말고..
     console.log(userData);
   };
 
-  const onClickRoom = (roomNumber: string) => {
+  const onClickRoom = (roomNumber: number) => {
     if (myRoom !== roomNumber) {
       setMyRoom(roomNumber);
       return;
     }
-    setMyRoom("");
+    setMyRoom(null);
   };
 
   //메인페이지 언마운트 시에 접속 끊긴것도 반영해야겠군...(로그아웃으로 처리)
@@ -63,20 +50,30 @@ export default function SubmitUserData() {
       >
         <label htmlFor="room">My Room:</label>
         <div className="flex flex-wrap gap-2 w-[370px]">
-          {roomNumber.map((room) => (
-            <button
-              key={room}
-              value={room}
-              className={clsx(
-                "px-2 py-1 bg-gray-400 rounded-md font-semibold select-none ",
-                myRoom === String(room) ? "bg-amber-700 text-yellow-50 " : ""
-              )}
-              type="button"
-              onClick={() => onClickRoom(room)}
-            >
-              {room}
-            </button>
-          ))}
+          {ROOM_LIST.map((room) => {
+            const booked = activatedRooms.includes(Number(room));
+            const selected = myRoom === room;
+
+            return (
+              <button
+                key={room}
+                value={room}
+                className={clsx(
+                  "px-2 py-1 rounded-md font-semibold select-none", // 배경색 없는 기본 스타일만
+                  {
+                    "bg-gray-600 text-gray-400": booked,
+                    "bg-amber-700 text-yellow-50": !booked && selected,
+                    "bg-gray-400": !booked && !selected,
+                  }
+                )}
+                type="button"
+                onClick={() => onClickRoom(room)}
+                disabled={booked}
+              >
+                {room}
+              </button>
+            );
+          })}
         </div>
         <label htmlFor="useJob">Your Job:</label>
         <input
@@ -85,8 +82,10 @@ export default function SubmitUserData() {
           name="useJob"
           placeholder="e.g. Developer, Dragon Slayer..."
           className={clsx(
-            "bg-gray-400 rounded-md px-2 placeholder-black/60 ",
-            myRoom !== "" ? "bg-amber-700 text-yellow-50  font-semibold " : ""
+            "rounded-md px-2 placeholder-black/60 ",
+            myRoom
+              ? "bg-amber-700 text-yellow-50  font-semibold "
+              : "bg-gray-400"
           )}
         />
         <label htmlFor="username">Your Name:</label>
@@ -95,8 +94,10 @@ export default function SubmitUserData() {
           id="username"
           name="username"
           className={clsx(
-            "bg-gray-400 rounded-md px-2",
-            myRoom !== "" ? "bg-amber-700 text-yellow-50 font-semibold " : ""
+            "rounded-md px-2",
+            myRoom
+              ? "bg-amber-700 text-yellow-50  font-semibold "
+              : "bg-gray-400"
           )}
         />
         <div>
