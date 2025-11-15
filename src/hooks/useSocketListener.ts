@@ -18,9 +18,13 @@ export const useSocketListener = () => {
       socket = io(process.env.NEXT_PUBLIC_SERVER);
     }
 
-    // 이벤트. 접속자 수 업데이트 수신
-    socket.on("update_user_list", (count: number) => {
-      console.log(`Received user count: ${count}`);
+    // 이벤트. 연결 성공
+    socket.on("connect", () => {});
+
+    // 이벤트. 연결 해제
+    socket.on("disconnect", () => {}); // disconnect 이벤트를 서버측에서는 꽤 느리게 처리함(연결 끊어진 후 몇 초 뒤에 처리하는듯)
+    socket.on("users-update-after-disconnect", (userCount: number) => {
+      console.log(`users-update-after-disconnect:${userCount}`);
     });
 
     // 이벤트. 최신 activatedRooms 데이터 수신 (첫 마운트 시, post성공해서 새로운 호스트(유저) 등록 시 발생)
@@ -32,9 +36,8 @@ export const useSocketListener = () => {
 
     // 클린업
     return () => {
-      socket.off("update_user_list");
-      socket.off("new_data_submitted");
+      socket.off("users-update-after-disconnect");
       socket.disconnect();
     };
-  }, []);
+  }, [setActivatedRooms]);
 };
