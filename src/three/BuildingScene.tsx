@@ -7,14 +7,12 @@ import { setOrbitControl } from "./settings/setOrbitControl";
 import { setupBloomEffect } from "./settings/setBloom";
 import makeBackground from "./mesh/makeBackground";
 import { setLight } from "./settings/setLight";
-import { useSocketListener } from "../hooks/useSocketListener";
 import { useRoomsUpdate } from "../hooks/useRoomsUpdate";
 
 export default function BuildingScene() {
   const mountRef = useRef<HTMLDivElement>(null);
   const [scene, setScene] = useState<THREE.Scene | null>(null);
 
-  useSocketListener();
   useEffect(() => {
     if (!mountRef.current) return;
 
