@@ -8,7 +8,7 @@ const CALL = {
 
 export default function UserProfile() {
   const { userData, registered } = userDataStore();
-  if (!registered) return;
+  if (!registered) return null;
 
   const { calledAs, nickName, myRoom, name, job, userType } = userData;
   const roomName = `${CALL[calledAs]}${nickName}'s Room`;

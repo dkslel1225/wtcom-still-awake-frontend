@@ -2,7 +2,17 @@
 
 ## 메모
 
-- 미사용 라이브러리 제거
+rm -rf node_modules package-lock.json
+npm install
+
+NEXT_PUBLIC_SERVER = "https://wtcom-still-awake-backend.onrender.com"
+
+NEXT_PUBLIC_SERVER = "http://localhost:3000/"
+
+- 새로고침하면 리셋된다는거 명시하기
+- 이름, 직업 입력란 : 글자수 제한
+
+* 미사용 라이브러리 제거
   - "@react-three/drei": "^10.7.6",
   - "@react-three/fiber": "^9.4.0",
   - classnames
