@@ -12,7 +12,7 @@ export const useSocketInit = () => {
     // 1. 소켓 인스턴스가 없으면 생성하고 useRef에 저장
     if (!socketRef.current) {
       const newSocket = io(process.env.REACT_APP_SERVER as string, {
-        transports: ["websocket"],
+        transports: ["polling", "websocket"],
       }); //  'websocket'설정: 리버스 프록시(Nginx, Cloudflare 등) 환경에서 polling이 막힐 수 있음(Vercel)
       socketRef.current = newSocket;
 
