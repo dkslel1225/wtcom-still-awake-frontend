@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { roomsStateStore } from "../store/roomsStateStore";
 import * as THREE from "three";
 
-export const useRoomsUpdate = (scene: THREE.Scene | null) => {
+export const useRoomsUpdate = (scene: THREE.Scene | null, myRoom: number) => {
   const { activatedRooms } = roomsStateStore();
 
   useEffect(() => {
@@ -16,9 +16,11 @@ export const useRoomsUpdate = (scene: THREE.Scene | null) => {
 
         try {
           const room = await waitForRoom(scene, name);
+          const isMyRoom = myRoom === roomNumber;
           const mat = room.material;
           if (mat instanceof THREE.MeshStandardMaterial) {
-            mat.emissiveIntensity = 0.35;
+            const intensity = isMyRoom ? 0.8 : 0.35;
+            mat.emissiveIntensity = intensity;
           }
         } catch (err) {
           console.warn(err);
@@ -27,7 +29,7 @@ export const useRoomsUpdate = (scene: THREE.Scene | null) => {
     };
 
     updateRooms();
-  }, [activatedRooms, scene]);
+  }, [activatedRooms, scene, myRoom]);
 };
 
 const waitForRoom = (scene: THREE.Scene, name: string) => {
