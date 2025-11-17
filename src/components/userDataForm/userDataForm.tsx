@@ -1,22 +1,24 @@
 import { useState } from "react";
-import { ROOM_LIST } from "../constants/room";
-import clsx from "clsx";
-import { roomsStateStore } from "../store/roomsStateStore";
-import { postUserData } from "../api/postUserData";
 
-import { userDataStore } from "../store/userDataStore";
-import { socketStore } from "../store/socketStore";
+import clsx from "clsx";
+
+import SelectRoom from "./selectRoom";
+import { ROOM_LIST } from "../../constants/room";
+import { roomsStateStore } from "../../store/roomsStateStore";
+import { postUserData } from "../../api/postUserData";
+import { userDataStore } from "../../store/userDataStore";
+import { socketStore } from "../../store/socketStore";
 
 const JOIN_AS_GUEST =
   "Sorry, Room 303 is currently taken. You can join as a Guest. If you want a room, please refresh the page and try again when a free room becomes available.";
-export default function SubmitUserData() {
+const AVATAR_VALUE = [1, 2, 3, 4];
+
+export default function UserDataForm() {
   const { activatedRooms } = roomsStateStore(); // 누가 사용중인 방은, 버튼 비활성화
   const [myRoom, setMyRoom] = useState<number | null>(null); // selectedRoom
 
   const { setUserData, registered, setRegistered } = userDataStore();
   const { socketId } = socketStore();
-
-  const avatarValue = [1, 2, 3, 4];
 
   const onClickSubmit = async (e: any) => {
     e.preventDefault();
@@ -63,34 +65,23 @@ export default function SubmitUserData() {
       >
         <label htmlFor="room">My Room:</label>
         <div className="flex flex-wrap gap-2 w-[370px]">
-          {ROOM_LIST.map((room) => {
+          {ROOM_LIST.map((room: number) => {
             const booked = activatedRooms.includes(Number(room));
             const selected = myRoom === room;
 
             return (
-              <button
-                key={room}
-                value={room}
-                className={clsx(
-                  "px-2 py-1 rounded-md font-semibold select-none", // 배경색 없는 기본 스타일만
-                  {
-                    "bg-gray-600 text-gray-400": booked,
-                    "bg-amber-700 text-yellow-50": !booked && selected,
-                    "bg-gray-400": !booked && !selected,
-                  }
-                )}
-                type="button"
-                onClick={() => onClickRoom(room)}
-                disabled={booked}
-              >
-                {room}
-              </button>
+              <SelectRoom
+                room={room}
+                booked={booked}
+                selected={selected}
+                onClickRoom={onClickRoom}
+              />
             );
           })}
         </div>
         <label htmlFor="avatar">My Avatar:</label>
         <div id="avatar" className="flex gap-4 size-full">
-          {avatarValue.map((value) => {
+          {AVATAR_VALUE.map((value) => {
             return (
               <label
                 key={value}

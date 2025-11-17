@@ -8,7 +8,7 @@ interface UserData {
 export const postUserData = async (userData: UserData) => {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_SERVER}/submit/userdata`,
+      `${process.env.REACT_APP_SERVER as string}/submit/userdata`,
       {
         method: "POST",
         headers: {
@@ -19,7 +19,7 @@ export const postUserData = async (userData: UserData) => {
     );
 
     const resData = await response.json();
-    console.log(resData); // 여기서 서버에서 반환한 JSON 확인 가능
+    return resData.data;
   } catch (err) {
     console.error("Error submitting user data:", err);
   }

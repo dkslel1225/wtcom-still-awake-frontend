@@ -1,4 +1,4 @@
-import { createContext, useEffect, useRef, ReactNode } from "react";
+import { useEffect, useRef } from "react";
 import { io, Socket } from "socket.io-client";
 import { roomsStateStore } from "../store/roomsStateStore";
 import { socketStore } from "../store/socketStore";
@@ -31,9 +31,8 @@ export const useSocketInit = () => {
       });
 
       // 이벤트 리스너(기타)
-      // recent_activated_rooms: 최신 방 상태 수신 (post성공해서 새로운 호스트(유저) 등록 시 모두에게 발생)
+      // recent_activated_rooms: 소켓 연결 직후, 유저 등록 직후, 수신 받음
       newSocket.on("recent_activated_rooms", (message: number[]) => {
-        console.log("new data submitted ------ ");
         console.log(message);
         setActivatedRooms(message);
       });
