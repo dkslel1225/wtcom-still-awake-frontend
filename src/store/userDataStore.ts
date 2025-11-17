@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-interface userData {
+export interface UserDataType {
   myRoom: number;
   job: string;
   name: string;
@@ -8,10 +8,11 @@ interface userData {
   calledAs: "Name" | "Job";
   avatarNum: number;
   userType: "Host" | "Guest";
+  guestId: string | null;
 }
 interface UserDataStoreType {
-  userData: userData;
-  setUserData: (data: userData) => void;
+  userData: UserDataType;
+  setUserData: (data: UserDataType) => void;
   registered: boolean;
   setRegistered: (state: boolean) => void;
 }
@@ -25,6 +26,7 @@ export const userDataStore = create<UserDataStoreType>((set, get) => ({
     avatarNum: 1,
     calledAs: "Name",
     userType: "Host",
+    guestId: null,
   },
   setUserData: (data) => set({ userData: data }),
   registered: false,
