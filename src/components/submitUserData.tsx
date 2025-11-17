@@ -4,9 +4,19 @@ import clsx from "clsx";
 import { roomsStateStore } from "../store/roomsStateStore";
 import { postUserData } from "../api/postUserData";
 
+import { userDataStore } from "../store/userDataStore";
+import { socketStore } from "../store/socketStore";
+
+const JOIN_AS_GUEST =
+  "Sorry, Room 303 is currently taken. You can join as a Guest. If you want a room, please refresh the page and try again when a free room becomes available.";
 export default function SubmitUserData() {
-  const { activatedRooms } = roomsStateStore();
-  const [myRoom, setMyRoom] = useState<number | null>(null);
+  const { activatedRooms } = roomsStateStore(); // 누가 사용중인 방은, 버튼 비활성화
+  const [myRoom, setMyRoom] = useState<number | null>(null); // selectedRoom
+
+  const { setUserData, registered, setRegistered } = userDataStore();
+  const { socketId } = socketStore();
+
+  const avatarValue = [1, 2, 3, 4];
 
   const onClickSubmit = async (e: any) => {
     e.preventDefault();
@@ -15,7 +25,7 @@ export default function SubmitUserData() {
     // 뭐 하나 값 비어있으면 버튼 비활성화 - 거절!
     if (!myRoom) {
       alert("Room selection is required.");
-      return; // 제출 중단
+      return;
     }
 
     const userData = {
@@ -23,13 +33,15 @@ export default function SubmitUserData() {
       job: data.get("useJob") || "No Job", // || 연산자는 앞의 값이 falsy(빈 문자열 "", null, undefined, 0, false)이면뒤의 값을 반환
       name: data.get("username") || "Anonymous",
       calledAsName: data.get("call-by-name") ? true : false,
+      avatarNum: data.get("avatar") || 1,
+      socketId: socketId,
     };
 
-    postUserData(userData);
+    const resData = await postUserData(userData);
+    setUserData(resData);
+    setRegistered(true);
     setMyRoom(null);
 
-    // 응답 성공하면, 내 방, 이름, 직업 데이터 다시 받음 -> 세션스토리지에 저장
-    // 내 방 불 켜야 함.-> 이건 백엔드에서 알아서 자동 업데이트하게 해줄까 - 굳이 여기서 하지 말고..
     console.log(userData);
   };
 
@@ -41,7 +53,8 @@ export default function SubmitUserData() {
     setMyRoom(null);
   };
 
-  //메인페이지 언마운트 시에 접속 끊긴것도 반영해야겠군...(로그아웃으로 처리)
+  if (registered) return;
+
   return (
     <div className="fixed top-5 right-5">
       <form
@@ -75,6 +88,32 @@ export default function SubmitUserData() {
             );
           })}
         </div>
+        <label htmlFor="avatar">My Avatar:</label>
+        <div id="avatar" className="flex gap-4 size-full">
+          {avatarValue.map((value) => {
+            return (
+              <label
+                key={value}
+                className={clsx(
+                  "hover:bg-gray-600 p-2 rounded-lg has-[input:checked]:bg-amber-700 "
+                )}
+              >
+                <input
+                  type="radio"
+                  name="avatar"
+                  value={value}
+                  className="hidden"
+                />
+                <img
+                  src={`/avatar/avatar${value}.png`}
+                  className="size-full cursor-pointer "
+                  alt="avatar"
+                />
+              </label>
+            );
+          })}
+        </div>
+
         <label htmlFor="useJob">Your Job:</label>
         <input
           type="text"
