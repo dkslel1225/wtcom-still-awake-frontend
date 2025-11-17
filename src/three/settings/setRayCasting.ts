@@ -1,0 +1,43 @@
+import { RefObject } from "react";
+import * as THREE from "three";
+
+// 트러블슈팅: setRayCasting내의 이벤트 리스너가, useEffect((),[])에서 호출되어, 최초 마운트 시 한 번만 생성됨. -> 이 리스너가 리액트의 상태값 (registered)을 처음 값 그대로 영구히 기억하는 "클로저(Closure) 문제가 발생함.""
+// 트러블슈팅: registered 값으로, 현재값을 고정으로 받는게 아닌, 가변적인 값을 담고 있는 Ref 객체를 받아야 함.
+// 예를들어, 전역상태값인 registered를 그대로 받거나, registered.current 값을 넘겨준다면, 레지스터 여부의 최신값이 반영되지 못하여, (!registered) 조건을 통과할 수 없음.(Stale Closure 문제)
+export const setRayCasting = (
+  scene: THREE.Scene,
+  camera: THREE.Camera,
+  registered: RefObject<boolean>
+) => {
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  const targetObjects = scene.children.filter((obj) =>
+    obj.name.startsWith("w")
+  );
+
+  const checkIntersects = () => {
+    if (!registered.current) return;
+
+    raycaster.setFromCamera(mouse, camera); // 카메라 시점에서 클릭했을때 처리
+    const intersectWindow = raycaster.intersectObjects(targetObjects, false)[0];
+
+    if (intersectWindow !== undefined) {
+      const roomName = intersectWindow.object.name;
+      console.log(roomName);
+    }
+  };
+
+  const handleClick = (e: MouseEvent) => {
+    // 마우스 좌표를 WebGL기준으로 변환 (브라우저/HTML 좌표계: 0~1, NDC(WebGL): -1~1)
+    // 브라우저 좌표: e.clientX / window.inerWidth
+    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -((e.clientY / window.innerHeight) * 2 - 1);
+    checkIntersects();
+  };
+
+  window.addEventListener("click", handleClick);
+
+  return () => {
+    window.removeEventListener("click", handleClick);
+  };
+};
