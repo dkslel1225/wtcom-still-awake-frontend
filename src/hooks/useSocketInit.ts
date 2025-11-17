@@ -1,31 +1,11 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  ReactNode,
-} from "react";
+import { createContext, useEffect, useRef, ReactNode } from "react";
 import { io, Socket } from "socket.io-client";
 import { roomsStateStore } from "../store/roomsStateStore";
+import { socketStore } from "../store/socketStore";
 
-interface SocketContextType {
-  socket: Socket | null;
-  socketId: string | null;
-  isConnected: boolean;
-}
-
-const SocketContext = createContext<SocketContextType>({
-  socket: null,
-  socketId: null,
-  isConnected: false,
-});
-
-export const SocketProvider = ({ children }: { children: ReactNode }) => {
+export const useSocketInit = () => {
   const socketRef = useRef<Socket | null>(null);
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [socketId, setSocketId] = useState<string | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
+  const { setSocketId, setIsConnected } = socketStore();
   const { setActivatedRooms } = roomsStateStore();
 
   useEffect(() => {
@@ -35,7 +15,6 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
         transports: ["websocket"],
       }); //  'websocket'설정: 리버스 프록시(Nginx, Cloudflare 등) 환경에서 polling이 막힐 수 있음(Vercel)
       socketRef.current = newSocket;
-      setSocket(newSocket);
 
       // 2. 이벤트 리스너(연결,해제)
       newSocket.on("connect", () => {
@@ -67,16 +46,4 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
       }
     };
   }, []);
-
-  return (
-    <SocketContext.Provider value={{ socket, socketId, isConnected }}>
-      {children}
-    </SocketContext.Provider>
-  );
-};
-
-// 소켓 정보 접근 - 커스텀 훅
-// ex. const { socket, socketId, isConnected } = useSocket();
-export const useSocket = () => {
-  return useContext(SocketContext);
 };
