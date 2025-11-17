@@ -55,7 +55,7 @@ export default function UserDataForm() {
     setMyRoom(null);
   };
 
-  if (registered) return;
+  if (registered) return null;
 
   return (
     <div className="fixed top-5 right-5">

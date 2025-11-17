@@ -42,4 +42,5 @@ export default function UserRoom() {
         />
       </div>
     );
+  else return null;
 }
