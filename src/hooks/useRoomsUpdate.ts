@@ -1,54 +1,62 @@
 import { useEffect } from "react";
 import { roomsStateStore } from "../store/roomsStateStore";
 import * as THREE from "three";
+import { getRoomPosition } from "../utils/getRoomPosition";
 
 export const useRoomsUpdate = (scene: THREE.Scene | null, myRoom: number) => {
-  const { activatedRooms } = roomsStateStore();
+  const { activatedRooms, deletedRoom } = roomsStateStore();
 
+  // activatedRooms UI 업데이트
   useEffect(() => {
     if (!scene) return;
 
     const updateRooms = async () => {
       for (const roomNumber of activatedRooms) {
-        const y = Math.floor(roomNumber / 100);
-        const x = roomNumber % 100;
-        const name = `window-${y}-${x}`;
+        const roomMaterial = getRoomObjectMaterial(roomNumber, scene);
+        const intensity = myRoom === roomNumber ? 0.8 : 0.35; // 내 방이면, 더 밝게
 
-        try {
-          const room = await waitForRoom(scene, name);
-          const isMyRoom = myRoom === roomNumber;
-          const mat = room.material;
-          if (mat instanceof THREE.MeshStandardMaterial) {
-            const intensity = isMyRoom ? 0.8 : 0.35;
-            mat.emissiveIntensity = intensity;
-          }
-        } catch (err) {
-          console.warn(err);
-        }
+        updateWindowMaterial(roomMaterial, intensity);
       }
     };
 
     updateRooms();
   }, [activatedRooms, scene, myRoom]);
+
+  // deletedRoom UI 업데이트
+  useEffect(() => {
+    if (!scene) return;
+
+    const updateRooms = async () => {
+      if (deletedRoom) {
+        const roomMaterial = getRoomObjectMaterial(deletedRoom, scene);
+        const intensity = 0;
+
+        updateWindowMaterial(roomMaterial, intensity);
+      }
+    };
+
+    updateRooms();
+  }, [deletedRoom, scene]);
 };
 
-const waitForRoom = (scene: THREE.Scene, name: string) => {
-  return new Promise<THREE.Mesh>((resolve, reject) => {
-    const timeout = 3000;
-    const interval = 50;
-    let lastTime = 0;
+// 방 오브젝트의, Material 반환
+const getRoomObjectMaterial = (roomNum: number, scene: THREE.Scene) => {
+  const { y, x } = getRoomPosition(roomNum);
+  const roomName = `window-${y}-${x}`;
 
-    const timer = setInterval(() => {
-      const room = scene.getObjectByName(name) as THREE.Mesh;
-      if (room) {
-        clearInterval(timer);
-        resolve(room);
-      }
-      if (!room && lastTime >= timeout) {
-        clearInterval(timer);
-        reject(new Error(`Timeout: failed room light update. ${name} missing`));
-      }
-      lastTime += interval;
-    }, interval);
-  });
+  const room = scene.getObjectByName(roomName) as THREE.Mesh;
+  const roomMaterial = room.material;
+  return roomMaterial;
+};
+
+// 방 창문 밝기 업데이트 (emissiveIntensity)
+const updateWindowMaterial = (
+  roomMaterial: THREE.Material | THREE.Material[],
+  intensity: number
+) => {
+  if (roomMaterial instanceof THREE.MeshStandardMaterial) {
+    roomMaterial.emissiveIntensity = intensity;
+  } else {
+    console.warn("roomMaterial is not a MeshStandardMaterial");
+  }
 };

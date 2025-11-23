@@ -6,7 +6,7 @@ import { socketStore } from "../store/socketStore";
 export const useSocketInit = () => {
   const socketRef = useRef<Socket | null>(null);
   const { setSocketId, setIsConnected } = socketStore();
-  const { setActivatedRooms } = roomsStateStore();
+  const { setActivatedRooms, setDeletedRoom } = roomsStateStore();
 
   useEffect(() => {
     // 1. 소켓 인스턴스가 없으면 생성하고 useRef에 저장
@@ -26,15 +26,24 @@ export const useSocketInit = () => {
         setIsConnected(false);
         setSocketId(null);
       });
-      newSocket.on("users-update-after-disconnect", (userCount: number) => {
-        console.log(`users-update-after-disconnect:${userCount}`);
+
+      // 새로고침, 창 닫기 방지
+      window.addEventListener("beforeunload", (e) => {
+        e.preventDefault();
+        e.returnValue = "";
       });
 
-      // 이벤트 리스너(기타)
+      // 2. 이벤트 리스너(기타)
       // recent_activated_rooms: 소켓 연결 직후, 유저 등록 직후, 수신 받음
       newSocket.on("recent_activated_rooms", (message: number[]) => {
-        console.log(message);
         setActivatedRooms(message);
+      });
+
+      //io.emit("recent_deleted_room", user.roomNum); 유저 연결이 끊긴 경우, 삭제
+      newSocket.on("recent_deleted_room", (deletedRoom: number) => {
+        console.log("roomdeleted");
+        console.log(deletedRoom);
+        setDeletedRoom(deletedRoom);
       });
     }
 
