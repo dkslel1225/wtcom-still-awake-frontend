@@ -1,22 +1,17 @@
 import { userDataStore } from "../../store/userDataStore";
-import { getRoomPosition } from "../../utils/getRoomPosition";
-import { getRoomColor } from "../../utils/getRoomColor";
 
 export default function UserRoom() {
-  const { userData } = userDataStore();
+  const { userData, myRoomColor } = userDataStore();
   const { myRoom, avatarNum, userType } = userData;
 
   const avatarSrc = `/avatar/avatar${avatarNum}.png`;
 
   if (userType === "Host") {
-    const { y, x } = getRoomPosition(myRoom);
-    const roomColor = getRoomColor(y, x);
-
     return (
       <>
         <div
           className="h-52 w-full rounded-lg overflow-hidden relative flex justify-center"
-          style={{ backgroundColor: `#${roomColor.toString(16)}` }}
+          style={{ backgroundColor: myRoomColor }}
         >
           <img
             src="/room.svg"

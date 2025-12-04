@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import { getRoomPosition } from "../utils/getRoomPosition";
+import { getRoomColor } from "../utils/getRoomColor";
 
 export interface UserDataType {
   myRoom: number;
@@ -15,6 +17,8 @@ interface UserDataStoreType {
   setUserData: (data: UserDataType) => void;
   registered: boolean;
   setRegistered: (state: boolean) => void;
+  myRoomColor: string;
+  setMyRoomColor: (myRoomNum: number) => void;
 }
 
 export const userDataStore = create<UserDataStoreType>((set, get) => ({
@@ -31,4 +35,12 @@ export const userDataStore = create<UserDataStoreType>((set, get) => ({
   setUserData: (data) => set({ userData: data }),
   registered: false,
   setRegistered: (state) => set({ registered: state }),
+  myRoomColor: "#3d3b3b",
+  setMyRoomColor: (myRoomNum) => {
+    const { y, x } = getRoomPosition(myRoomNum);
+    const roomColor = getRoomColor(y, x);
+    return set({
+      myRoomColor: roomColor,
+    });
+  },
 }));

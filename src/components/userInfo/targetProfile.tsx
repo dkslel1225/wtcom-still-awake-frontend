@@ -4,6 +4,8 @@ import { getTargetHostData } from "../../api/getTargetHostData";
 import { TargetHostDataType } from "../../store/targetHostDataStore";
 import HostRoom from "./hostRoom";
 import { JoinChatButton } from "./joinChatButton";
+import { getRoomPosition } from "../../utils/getRoomPosition";
+import { getRoomColor } from "../../utils/getRoomColor";
 
 export default function TargetProfile() {
   const { targetRoom, setTargetRoom } = roomsStateStore();
@@ -26,11 +28,21 @@ export default function TargetProfile() {
   if (!targetData) return null;
 
   const { roomNum, avatarNum, job, name, nickName } = targetData;
+
+  const { y, x } = getRoomPosition(roomNum);
+  const roomColor = getRoomColor(y, x);
+
   return (
     <>
       <div className="flex flex-col gap-2  bg-black/50 p-4  rounded-2xl">
         <div className="flex min-w-60 gap-20 justify-between">
-          <p className="text-white">{nickName}'s Room</p>
+          <div className=" flex gap-2 items-center">
+            <div
+              className="size-5 rounded-full"
+              style={{ backgroundColor: roomColor }}
+            ></div>
+            <p className="text-white">{nickName}'s Room</p>
+          </div>
           <p className=" text-white font-semibold">{roomNum}</p>
         </div>
         <HostRoom roomNum={roomNum} avatarNum={avatarNum} />

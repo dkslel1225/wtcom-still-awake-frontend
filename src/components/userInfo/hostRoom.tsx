@@ -17,7 +17,7 @@ export default function HostRoom({
     <>
       <div
         className="h-52 w-full rounded-lg overflow-hidden relative flex justify-center"
-        style={{ backgroundColor: `#${roomColor.toString(16)}` }}
+        style={{ backgroundColor: roomColor }}
       >
         <img
           src="/room.svg"

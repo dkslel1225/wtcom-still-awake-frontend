@@ -17,7 +17,8 @@ export default function UserDataForm() {
   const { activatedRooms } = roomsStateStore(); // 누가 사용중인 방은, 버튼 비활성화
   const [myRoom, setMyRoom] = useState<number | null>(null); // selectedRoom
 
-  const { setUserData, registered, setRegistered } = userDataStore();
+  const { setUserData, setMyRoomColor, registered, setRegistered } =
+    userDataStore();
   const { socketId } = socketStore();
 
   const onClickSubmit = async (e: any) => {
@@ -41,6 +42,7 @@ export default function UserDataForm() {
 
     const resData = await postUserData(userData);
     setUserData(resData);
+    setMyRoomColor(resData.myRoom);
     setRegistered(true);
     setMyRoom(null);
 
@@ -71,6 +73,7 @@ export default function UserDataForm() {
 
             return (
               <SelectRoom
+                key={room}
                 room={room}
                 booked={booked}
                 selected={selected}

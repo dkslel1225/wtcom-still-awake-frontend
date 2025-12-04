@@ -1,30 +1,36 @@
+import { roomsStateStore } from "../../store/roomsStateStore";
 import { userDataStore } from "../../store/userDataStore";
 import UserRoom from "./userRoom";
 
-const CALL = {
-  Job: "A ",
-  Name: "",
-};
-
 export default function UserProfile() {
-  const { userData, registered } = userDataStore();
-  if (!registered) return null;
-
+  const { userData, registered, myRoomColor } = userDataStore();
+  const { targetRoom } = roomsStateStore();
   const { calledAs, nickName, myRoom, name, job, userType } = userData;
-  const roomName = `${CALL[calledAs]}${nickName}'s Room`;
+
+  if (!registered) return null;
 
   return (
     <>
-      <div className="fixed top-5 right-5 flex flex-col gap-2  bg-black/50 p-4  rounded-2xl">
-        <div className="flex gap-20 justify-between">
-          <p className="text-white">{roomName}</p>
+      <div className="flex flex-col gap-2  bg-black/50 p-4  rounded-2xl">
+        <div className="flex min-w-60 gap-20 justify-between">
+          <div className=" flex gap-2 items-center">
+            <div
+              className="size-5 rounded-full"
+              style={{ backgroundColor: myRoomColor }}
+            ></div>
+            <p className="text-white">My Room</p>
+          </div>
           <p className=" text-white font-semibold">
             {userType === "Host" ? myRoom : "Guest"}
           </p>
         </div>
-        <UserRoom />
-        <p className="text-white">name: {name}</p>
-        <p className="text-white">job: {job}</p>
+        {!targetRoom && (
+          <div className="flex flex-col gap-2">
+            <UserRoom />
+            <p className="text-white">name: {name}</p>
+            <p className="text-white">job: {job}</p>
+          </div>
+        )}
       </div>
     </>
   );
