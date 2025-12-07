@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { roomsStateStore } from "../../store/roomsStateStore";
 import { calculateRoomNumber } from "../../utils/calculateRoomNumber";
 import { userDataStore } from "../../store/userDataStore";
+import { chatStateStore } from "../../store/chatStateStore";
 
 // 트러블슈팅: setRayCasting내의 이벤트 리스너가, useEffect((),[])에서 호출되어, 최초 마운트 시 한 번만 생성됨. -> 이 리스너가 리액트의 상태값 (registered)을 처음 값 그대로 영구히 기억하는 "클로저(Closure) 문제가 발생함.""
 // 트러블슈팅: registered 값으로, 현재값을 고정으로 받는게 아닌, 가변적인 값을 담고 있는 Ref 객체를 받아야 함.
@@ -17,9 +18,9 @@ export const setRayCasting = (
   const targetObjects = scene.children.filter((obj) =>
     obj.name.startsWith("w")
   );
-
   const checkIntersects = () => {
-    if (!registered.current) return;
+    const { chatting } = chatStateStore.getState();
+    if (!registered.current || chatting) return;
     // 트러블슈팅: 이거를 통과 못했던 기억이.. 아마도 registered.current값을 제대로 업데이트 못받아서..?
     // 이거를 재호출안되게 함수 바깥에 있어서 문제였다.(getState() 사용하는거로 바꾸고~)
 
