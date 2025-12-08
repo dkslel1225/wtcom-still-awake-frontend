@@ -1,17 +1,14 @@
 import { getRoomPosition } from "../../utils/getRoomPosition";
 import { getRoomColor } from "../../utils/getRoomColor";
 
-export default function HostRoom({
-  roomNum,
+export default function TargetRoom({
+  roomColor,
   avatarNum,
 }: {
-  roomNum: number;
+  roomColor: string;
   avatarNum: number;
 }) {
   const avatarSrc = `/avatar/avatar${avatarNum}.png`;
-
-  const { y, x } = getRoomPosition(roomNum);
-  const roomColor = getRoomColor(y, x);
 
   return (
     <>
