@@ -1,12 +1,14 @@
 import UserDataForm from "./components/userDataForm/userDataForm";
 import TargetProfile from "./components/userInfo/targetProfile";
 import UserProfile from "./components/userInfo/userProfile";
-
+import { useChatSocket } from "./hooks/useChatSocket";
 import { useSocketInit } from "./hooks/useSocketInit";
 import BuildingScene from "./three/BuildingScene";
 
 export default function App() {
   useSocketInit();
+  useChatSocket();
+
   return (
     <div style={{ width: "100vw", height: "100vh" }} className="text-white">
       <BuildingScene />
@@ -15,7 +17,6 @@ export default function App() {
         <UserProfile />
         <TargetProfile />
       </div>
-      <div>dd</div>
     </div>
   );
 }
