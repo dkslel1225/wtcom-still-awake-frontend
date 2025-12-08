@@ -68,7 +68,7 @@ export default function UserDataForm() {
         <label htmlFor="room">My Room:</label>
         <div className="flex flex-wrap gap-2 w-[370px]">
           {ROOM_LIST.map((room: number) => {
-            const booked = activatedRooms.includes(Number(room));
+            const booked = activatedRooms?.includes(Number(room)) || false;
             const selected = myRoom === room;
 
             return (
