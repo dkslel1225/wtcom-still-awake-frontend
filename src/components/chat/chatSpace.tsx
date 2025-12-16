@@ -61,13 +61,15 @@ export default function ChatSpace({ roomNum }: { roomNum: number }) {
       )}
       {chatting && (
         <div className="relative flex flex-col justify-end pb-3 bg-black/50  p-2 rounded-2xl h-96 border-y-2 border-x-2 border-x-gray-700 border-y-gray-400">
-          <button
-            onClick={onClickLeave}
-            className="absolute top-2 right-2 rounded-lg px-1 border hover:bg-white/25"
-          >
-            Leave
-          </button>
-          <Participants />
+          <div className="flex gap-2 justify-between items-center mb-2">
+            <Participants />
+            <button
+              onClick={onClickLeave}
+              className="rounded-lg px-1 border hover:bg-white/25"
+            >
+              Leave
+            </button>
+          </div>
           <ChatMessageHistory />
           <form
             className="w-full flex justify-between items-center gap-1"

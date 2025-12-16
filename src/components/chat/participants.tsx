@@ -1,21 +1,35 @@
+import { useState } from "react";
 import { chatStateStore } from "../../store/chatStateStore";
 
 export default function Participants() {
   const { participants } = chatStateStore();
-
+  const [listOpen, setListOpen] = useState(false);
   return (
     <>
-      {/* <div className="absolute top-3 left-3 w-11/12"> */}
-      <div className="w-11/12">
-        <p>Participants: {participants.length}</p>
-        {participants.map((name, idx) => {
-          return (
-            <p className="break-all" key={`${idx}${name}`}>
-              - {name}
-            </p>
-          );
-        })}
+      <div className="px-1 border rounded-lg">
+        <button
+          onClick={() => {
+            setListOpen(!listOpen);
+          }}
+        >
+          Participants: {participants.length}
+        </button>
+        {listOpen && <ParticipantsList participants={participants} />}
       </div>
     </>
+  );
+}
+
+export function ParticipantsList({ participants }: { participants: string[] }) {
+  return (
+    <div>
+      {participants.map((name, idx) => {
+        return (
+          <p className="break-all" key={`${idx}${name}`}>
+            - {name}
+          </p>
+        );
+      })}
+    </div>
   );
 }
