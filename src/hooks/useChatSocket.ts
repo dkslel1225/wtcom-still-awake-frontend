@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { io } from "socket.io-client";
 import { CHAT_NAMESPACE, SERVER_URL } from "../constants/api";
-import { chatStateStore } from "../store/chatStateStore";
+import { chatStateStore, messageDataType } from "../store/chatStateStore";
 
 export const useChatSocket = () => {
-  const { setChatSocket, chatSocket, setParticipants } = chatStateStore();
+  const { setChatSocket, chatSocket, setParticipants, setNewMessage } =
+    chatStateStore();
 
   useEffect(() => {
     if (!chatSocket) {
@@ -22,6 +23,9 @@ export const useChatSocket = () => {
       newSocket.on("notification", (participants: string[]) => {
         console.log(`참여자 목록 변경:`, participants);
         setParticipants(participants);
+      });
+      newSocket.on("receiveMessage", (messageData: messageDataType) => {
+        setNewMessage(messageData);
       });
     }
 

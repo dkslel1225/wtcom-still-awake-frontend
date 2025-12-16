@@ -44,7 +44,6 @@ export const setRayCasting = (
       // set target room data -> trigger <TargetProgile/>
       if (isNotEmptyRoom && isMyRoom) {
         setTargetRoom(roomNum);
-        console.log(`targetroom: ${targetRoom}`);
       }
     }
   };
