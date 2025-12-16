@@ -3,10 +3,12 @@ import { roomsStateStore } from "../store/roomsStateStore";
 import * as THREE from "three";
 import { getRoomPosition } from "../utils/getRoomPosition";
 import TargetRoom from "../components/userInfo/targetRoom";
+import { chatStateStore } from "../store/chatStateStore";
 
 export const useRoomsUpdate = (scene: THREE.Scene | null, myRoom: number) => {
   const { activatedRooms, deletedRoom, targetRoom, setTargetRoom } =
     roomsStateStore();
+  const { chatting, setChatting } = chatStateStore();
 
   // activatedRooms UI 업데이트
   useEffect(() => {
@@ -36,9 +38,12 @@ export const useRoomsUpdate = (scene: THREE.Scene | null, myRoom: number) => {
         updateWindowMaterial(roomMaterial, intensity);
 
         if (targetRoom === deletedRoom) {
-          //get out of target room
+          //get out of deleted target room
           setTargetRoom(null);
-          console.log("targetrroom null reseted");
+          if (chatting) {
+            setChatting(false);
+          }
+          alert("방 주인이 나갔습니다.");
         }
       }
     };
