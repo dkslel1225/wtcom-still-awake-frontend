@@ -2,9 +2,11 @@ import { useEffect } from "react";
 import { roomsStateStore } from "../store/roomsStateStore";
 import * as THREE from "three";
 import { getRoomPosition } from "../utils/getRoomPosition";
+import TargetRoom from "../components/userInfo/targetRoom";
 
 export const useRoomsUpdate = (scene: THREE.Scene | null, myRoom: number) => {
-  const { activatedRooms, deletedRoom } = roomsStateStore();
+  const { activatedRooms, deletedRoom, targetRoom, setTargetRoom } =
+    roomsStateStore();
 
   // activatedRooms UI 업데이트
   useEffect(() => {
@@ -32,6 +34,12 @@ export const useRoomsUpdate = (scene: THREE.Scene | null, myRoom: number) => {
         const intensity = 0;
 
         updateWindowMaterial(roomMaterial, intensity);
+
+        if (targetRoom === deletedRoom) {
+          //get out of target room
+          setTargetRoom(null);
+          console.log("targetrroom null reseted");
+        }
       }
     };
 

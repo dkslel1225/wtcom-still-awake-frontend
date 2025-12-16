@@ -42,8 +42,11 @@ export const useSocketInit = () => {
 
       //io.emit("recent_deleted_room", user.roomNum); 유저 연결이 끊긴 경우, 삭제
       newSocket.on("recent_deleted_room", (deletedRoom: number) => {
-        console.log("roomdeleted");
-        console.log(deletedRoom);
+        // if (targetRoom === deletedRoom) { // 트러브슈팅: 클로저 문제로 제대로 실행 안되는듯!
+        //   //get out of target room
+        //   setTargetRoom(null);
+        //   console.log("targetrroom null reseted");
+        // }
         setDeletedRoom(deletedRoom);
       });
     }
